@@ -1,0 +1,18 @@
+
+WITH age_classify AS (SELECT *
+                            ,CASE 
+                              WHEN age = '20~24세' THEN 'college'
+                              WHEN age = '25~29세' OR age = '30~34세' OR age = '35~39세' THEN 'worker_carless'
+                              WHEN age = '40~44세' OR age = '45~49세' OR age = '50~54세' OR age = '55~59세' THEN 'worker_owned_car'
+                              ELSE '기타' END AS age_category
+                      FROM `portfolio-428606.spot_dev.age_ppl`)
+
+ SELECT city 
+       ,year
+       ,age_category
+       ,SUM(population) AS total
+ FROM age_classify
+ WHERE 1=1 
+ AND age_category != '기타'
+ GROUP BY 1, 2, 3 
+ ORDER BY 1, 2, 3
