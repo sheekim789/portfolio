@@ -1,0 +1,13 @@
+WITH t001 AS (SELECT rent_id
+                    ,region
+                    ,id AS path_id 
+                    ,ST_GEOGPOINT(longitude, latitude) AS start_point
+                    ,LEAD(ST_GEOGPOINT(longitude, latitude) ) OVER (PARTITION BY rent_id ORDER BY id ) AS end_point
+              FROM `portfolio-428606.spot_dev.path` )
+
+SELECT rent_id 
+      ,region
+      ,path_id 
+      ,ST_MAKELINE(start_point, end_point) AS path
+FROM t001 
+WHERE ST_MAKELINE(start_point, end_point) IS NOT NULL 
