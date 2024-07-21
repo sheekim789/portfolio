@@ -28,3 +28,4 @@ FROM (SELECT ym
       FROM inflow) 
 GROUP BY 1
 ORDER BY 1 
+;
