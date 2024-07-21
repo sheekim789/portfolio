@@ -1,13 +1,13 @@
 WITH t001 AS (SELECT rent_id
-                    ,region
-                    ,id AS path_id 
-                    ,ST_GEOGPOINT(longitude, latitude) AS start_point
-                    ,LEAD(ST_GEOGPOINT(longitude, latitude) ) OVER (PARTITION BY rent_id ORDER BY id ) AS end_point
+                    ,region      
+                    ,id AS path_id                                                                                    -- 대여건의 차량위치가 찍힌 순서                                               
+                    ,ST_GEOGPOINT(longitude, latitude) AS start_point                                                 -- 수집된 차량의 위도, 경도데이터를 위치 포인트로 전환
+                    ,LEAD(ST_GEOGPOINT(longitude, latitude) ) OVER (PARTITION BY rent_id ORDER BY id ) AS end_point   -- 현재 위치와 다음 위치 데이터 연결을 위해 다음 위치 데이터를 끌어올림
               FROM `portfolio-428606.spot_dev.path` )
 
 SELECT rent_id 
       ,region
       ,path_id 
-      ,ST_MAKELINE(start_point, end_point) AS path
+      ,ST_MAKELINE(start_point, end_point) AS path                                                                    -- 현재 위치와 다음 위치를 선으로 연결하여 차량의 이동경로를 선으로 전환
 FROM t001 
-WHERE ST_MAKELINE(start_point, end_point) IS NOT NULL 
+WHERE ST_MAKELINE(start_point, end_point) IS NOT NULL                                                                 
