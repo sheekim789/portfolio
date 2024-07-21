@@ -1,0 +1,30 @@
+
+WITH inflow AS (SELECT yyyymm AS ym 
+                        ,CASE 
+                              WHEN departure_code = 41590 THEN '경기도_화성시'
+                              WHEN departure_code = 41220 THEN '경기도_평택시'
+                              WHEN departure_code = 41480 THEN '경기도_파주시'
+                              WHEN departure_code = 41500 THEN '경기도_이천시'
+                              WHEN departure_code = 41630 THEN '경기도_양주시'
+                         END AS region                                                    -- 지역 식별을 위해 법정동코드를 지역명으로 변환
+                        ,Inflow__male_10s + Inflow__female_10s AS teens
+                        ,Inflow__male_20s + Inflow__female_20s AS twenties
+                        ,Inflow__male_30s + Inflow__female_30s AS thirties
+                        ,Inflow__male_40s + Inflow__female_40s + Inflow__male_50s + Inflow__female_50s + Inflow__male_60s + Inflow__female_60s + Inflow__male_70s + Inflow__female_70s AS fourties_over
+                  FROM `portfolio-428606.spot_dev.inflow_ppl` 
+                  WHERE 1=1 
+                  AND departure_code = 41590   -- 경기도 화성시
+                  OR departure_code = 41220 -- 경기도 평택시 
+                  OR departure_code = 41480 -- 경기도 파주시
+                  OR departure_code = 41500 -- 경기도 이천시
+                  OR departure_code = 41630 -- 경기도 양주시
+                  )
+
+SELECT region
+      ,ROUND(SUM(total_ppl)) AS inflow_total
+FROM (SELECT ym 
+            ,region 
+            ,teens + twenties + thirties + fourties_over AS total_ppl
+      FROM inflow) 
+GROUP BY 1
+ORDER BY 1 
